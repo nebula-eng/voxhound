@@ -1,0 +1,73 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+wheelhouse/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+
+# Tooling caches
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+
+# Captures and generated artifacts (never commit real traffic)
+*.pcap
+!tests/fixtures/*.pcap
+*.pcapng
+*.cap
+captures/
+out/
+reports/
+voxhound.db
+voxhound.db-*
+*.sqlite3
+# Case databases hold hashes and metadata of captured traffic — never commit
+*.db
+*.db-wal
+*.db-shm
+!tests/fixtures/*.db
+
+# Media carved out of traffic
+carved/
+*.wav
+!tests/fixtures/*.wav
+
+# Agent/session scratch data (never publish)
+.workbuddy/
+
+# Author's scratch folder. Never published: it holds private notes and the
+# release checklist. Three patterns on purpose, because one is not enough if the
+# directory is copied under a different name or a file is moved out by hand.
+作者小屋/
+作者小屋*
+GitHub上传清单.md
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+*.swp
