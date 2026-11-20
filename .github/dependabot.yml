@@ -1,0 +1,33 @@
+version: 2
+
+# This project has no runtime dependencies at all, so everything Dependabot
+# tracks here is a development tool. A major bump to pytest, ruff or PySide6 is
+# a decision that needs a read of the changelog, not a pull request that
+# arrives on its own and runs the full three-OS matrix.
+#
+# So majors are ignored. Patch and minor updates are grouped per ecosystem and
+# opened at most once a month.
+
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      dev-dependencies:
+        applies-to: version-updates
+        update-types: ["patch", "minor"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      actions:
+        applies-to: version-updates
+        patterns: ["*"]

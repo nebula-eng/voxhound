@@ -1,0 +1,9 @@
+* text=auto eol=lf
+# cmd.exe resolves `goto` labels by byte offset and mis-parses LF-only scripts.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.pcap binary
+*.pcapng binary
+*.png binary
+*.wav binary
+*.ico binary

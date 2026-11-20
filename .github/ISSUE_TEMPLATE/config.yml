@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞
+    url: https://github.com/nebula-eng/voxhound/security/advisories/new
+    about: 请私下报告。可利用的问题不要开公开 issue。
+  - name: 使用问题 / 讨论
+    url: https://github.com/nebula-eng/voxhound/discussions
+    about: 关于抓包、规则或部署的提问。

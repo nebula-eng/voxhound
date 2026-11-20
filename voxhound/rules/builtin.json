@@ -1,0 +1,271 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "tls-no-sni",
+      "name": "TLS 握手未携带 SNI",
+      "severity": 2,
+      "scope": "event",
+      "description": "客户端连接时没有给出服务器名。常见于直连 IP、域前置，以及部分恶意加载器。",
+      "match": {
+        "kind": "tls",
+        "tag_any": [
+          "no-sni"
+        ]
+      },
+      "tags": [
+        "evasion"
+      ],
+      "mitre": "T1090"
+    },
+    {
+      "id": "tls-ech",
+      "name": "客户端提供加密 ClientHello（ECH）",
+      "severity": 1,
+      "scope": "event",
+      "description": "ECH 会让被动观察者看不到 SNI。属于变更管理需要记录的事实，不应当作攻击直接告警。",
+      "match": {
+        "kind": "tls",
+        "tag_any": [
+          "ech"
+        ]
+      },
+      "tags": [
+        "privacy"
+      ],
+      "mitre": "T1573"
+    },
+    {
+      "id": "tls-self-signed",
+      "name": "使用自签名证书",
+      "severity": 2,
+      "scope": "event",
+      "description": "证书的签发者就是它自己——C2 基础设施、实验设备和拦截代理的典型特征。",
+      "match": {
+        "kind": "tls",
+        "tag_any": [
+          "self-signed-cert"
+        ]
+      },
+      "tags": [
+        "c2"
+      ],
+      "mitre": "T1587.003"
+    },
+    {
+      "id": "tls-cert-mismatch",
+      "name": "证书与 SNI 不匹配",
+      "severity": 3,
+      "scope": "event",
+      "description": "返回的证书并不覆盖所请求的主机名。可能是拦截、配置错误或基于域名的过滤。",
+      "match": {
+        "kind": "tls",
+        "tag_any": [
+          "cert-hostname-mismatch"
+        ]
+      },
+      "tags": [
+        "interception"
+      ],
+      "mitre": "T1557"
+    },
+    {
+      "id": "tls-obsolete-version",
+      "name": "协商出过时的 TLS 版本",
+      "severity": 2,
+      "scope": "event",
+      "description": "协商结果为 TLS 1.0/1.1 或 SSLv3，多数网络中属于明确的安全基线违规。",
+      "match": {
+        "kind": "tls",
+        "title_regex": "ServerHello (TLS1\\.[01]|SSL)"
+      },
+      "tags": [
+        "hygiene"
+      ],
+      "mitre": "T1040"
+    },
+    {
+      "id": "tls-sni-rejected",
+      "name": "服务端拒绝了该 SNI",
+      "severity": 2,
+      "scope": "event",
+      "description": "unrecognized_name 告警：服务端并不提供这个名称。可用于发现仿冒域名或出网过滤。",
+      "match": {
+        "kind": "tls",
+        "tag_any": [
+          "sni-rejected"
+        ]
+      },
+      "tags": [
+        "network-policy"
+      ],
+      "mitre": "T1598"
+    },
+    {
+      "id": "dns-long-label",
+      "name": "DNS 查询使用了超长标签",
+      "severity": 3,
+      "scope": "event",
+      "description": "标签长度超过 50 个字符是 DNS 隧道/数据外传的经典形态。",
+      "match": {
+        "kind": "dns",
+        "title_regex": "^DNS query [a-z0-9]{50,}\\."
+      },
+      "tags": [
+        "exfiltration"
+      ],
+      "mitre": "T1048.003"
+    },
+    {
+      "id": "dns-algorithmic-domain",
+      "name": "疑似算法生成的域名（DGA）",
+      "severity": 2,
+      "scope": "event",
+      "description": "查询标签在熵、数字比例与连续辅音等维度得分偏高，符合 DGA 特征。",
+      "match": {
+        "kind": "dns",
+        "title_regex": "^suspicious algorithmic domain"
+      },
+      "tags": [
+        "dga"
+      ],
+      "mitre": "T1568.002"
+    },
+    {
+      "id": "dns-txt-heavy",
+      "name": "返回了体积较大的 TXT 记录",
+      "severity": 1,
+      "scope": "event",
+      "description": "长 TXT 应答既可能来自正常的策略分发，也可能被用于数据夹带；此处记录以便做量级分析。",
+      "match": {
+        "kind": "dns",
+        "title_regex": " DNS response .* TXT",
+        "detail": {
+          "answers": ""
+        }
+      },
+      "tags": [
+        "dns"
+      ],
+      "mitre": "T1048"
+    },
+    {
+      "id": "http-cleartext-auth",
+      "name": "明文 HTTP 传输凭据",
+      "severity": 3,
+      "scope": "event",
+      "description": "Authorization 头或密码字段以未加密方式经过网络。",
+      "match": {
+        "kind": "http",
+        "detail": {
+          "auth": "true"
+        }
+      },
+      "tags": [
+        "credentials"
+      ],
+      "mitre": "T1040"
+    },
+    {
+      "id": "http-server-error-burst",
+      "name": "出现 HTTP 5xx 响应",
+      "severity": 1,
+      "scope": "event",
+      "description": "观察到服务端错误，可结合故障时间线做关联分析。",
+      "match": {
+        "kind": "http",
+        "tag_any": [
+          "http-5xx"
+        ]
+      },
+      "tags": [
+        "availability"
+      ],
+      "mitre": ""
+    },
+    {
+      "id": "smb-egress",
+      "name": "SMB 流量离开本机",
+      "severity": 3,
+      "scope": "flow",
+      "description": "445/139 端口出现在服务器网段之外，通常意味着横向移动或错误挂载。",
+      "match": {
+        "proto": "TCP",
+        "port_in": [
+          445,
+          139
+        ]
+      },
+      "tags": [
+        "lateral-movement"
+      ],
+      "mitre": "T1021.002"
+    },
+    {
+      "id": "telnet-cleartext",
+      "name": "Telnet 会话",
+      "severity": 2,
+      "scope": "flow",
+      "description": "Telnet 本身不加密，凭据以明文传输。",
+      "match": {
+        "proto": "TCP",
+        "port": 23
+      },
+      "tags": [
+        "hygiene"
+      ],
+      "mitre": "T1040"
+    },
+    {
+      "id": "voip-cleartext-g711",
+      "name": "未加密的 G.711 语音流",
+      "severity": 1,
+      "scope": "flow",
+      "description": "RTP 以明文承载 G.711，在受监管环境中属于隐私暴露面。",
+      "match": {
+        "proto": "UDP",
+        "tag_any": [
+          "voice-g711"
+        ]
+      },
+      "tags": [
+        "privacy",
+        "voip"
+      ],
+      "mitre": "T1040"
+    },
+    {
+      "id": "large-upload",
+      "name": "大量数据外发",
+      "severity": 2,
+      "scope": "flow",
+      "description": "单条会话外发超过 20 MiB。升级处置前请先结合目标信誉判断。",
+      "match": {
+        "bytes_gt": 20971520,
+        "sni_regex": ""
+      },
+      "tags": [
+        "exfiltration"
+      ],
+      "mitre": "T1041"
+    },
+    {
+      "id": "long-lived-encrypted-flow",
+      "name": "长时间存活的加密会话",
+      "severity": 1,
+      "scope": "flow",
+      "description": "持续超过 30 分钟的 TLS 会话——持久化 C2 长这样，视频通话也长这样，需要结合上下文。",
+      "match": {
+        "proto": "TCP",
+        "duration_gt": 1800,
+        "app_in": [
+          "TLS"
+        ]
+      },
+      "tags": [
+        "c2"
+      ],
+      "mitre": "T1071.001"
+    }
+  ]
+}

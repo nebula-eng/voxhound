@@ -1,0 +1,70 @@
+name: 缺陷报告
+description: 崩溃、卡住，或者给出了错误的分析结论
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **请不要上传你无权分享的抓包。** 请先脱敏地址与载荷：
+        `voxhound extract capture.pcap -o small.pcap --filter "..."`。
+
+        安全问题请走私密 advisory，不要在这里贴 —— 见 SECURITY.md。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 你期望的结果是什么？实际又得到了什么？
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: 命令行
+      render: shell
+      placeholder: voxhound analyze capture.pcapng --report out.html
+    validations:
+      required: true
+  - type: textarea
+    id: traceback
+    attributes:
+      label: 报错堆栈 / 日志输出
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: "`voxhound version` 的输出"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 问题出在哪一层
+      options:
+        - 抓包（pcap/pcapng 读取、在线抓包）
+        - 解码（链路/IP/TCP 层）
+        - 重组
+        - 解析器（TLS/HTTP/DNS/QUIC/RTP…）
+        - 媒体 / 载荷还原
+        - 规则 / 检测
+        - 导出（HTML/JSON/SQLite/pcap）
+        - 桌面界面
+        - 命令行
+        - 文档
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 最小复现
+      description: |
+        最理想的是几个能复现的包：`voxhound demo` 的输出、构造出的帧，或过滤后的采样。
+        如果问题与数据相关，这是唯一能让我们修好的东西。
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 确认
+      options:
+        - label: 我有权分析涉及的流量
+          required: true
+        - label: 我已确认这不是文档中写明的限制（README / docs/PROTOCOLS.md）
+          required: true
